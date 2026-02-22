@@ -14777,28 +14777,15 @@ Dr. Schnitzer</div><div class="rec-btns"><button class="rbtn rc" onclick="copiar
 </div>
 
 <script>
-const BASE = [
-{ titulo: "Abejas (1/4)", contenido: "La ley de la retención del calor olfativo del ..." },
-// … aquí van tus 1889 registros restantes …
+const BASE = [{ titulo: "Abejas (1/4)", contenido: "La ley de la retención del calor olfativo del ..." },
 ];
 
-const K = "ern_v3";
-let idx = -1;
-let fday = 1;
-let rend = 0;
-
-let data;
-let guardados = localStorage.getItem("misRegistros");
 
 if (guardados) {
 data = JSON.parse(guardados);
 } else {
 data = BASE.map(r => ({ titulo: r.titulo, contenido: r.contenido }));
 }
-</script>
-
-	onst BASE = [{"titulo":"Abejas (1/4)","contenido":"..."}];
-
 const K = 'ern_v3';
 let data = [];
 let eIdx = -1;
@@ -14870,6 +14857,15 @@ render();
 toast('&#10003; OK! Drücke Speichern!');
 }
 
+function abrirDel(i) {
+    dIdx = i;
+    document.getElementById('mDT').textContent = 'Eliminar: "' + data[i].titulo + '"?';
+    document.getElementById('ovD').classList.add('show');
+}
+
+function cerrarD() {
+    document.getElementById('ovD').classList.remove('show');
+}
 function borrarOk() {
 data.splice(dIdx, 1);
 pend++;
@@ -14877,7 +14873,6 @@ cerrarD();
 render();
 toast('&#10003; eliminado!');
 }
-
 
 function ordenar() {
     data.sort(function(a, b) { return a.titulo.localeCompare(b.titulo, 'de'); });
