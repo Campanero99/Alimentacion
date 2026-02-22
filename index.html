@@ -14853,41 +14853,35 @@ function setAviso(color, msg) {
 }
 
 function render() {
-    var q = document.getElementById('buscar').value.toLowerCase().trim();
-    var lista = q
+    var q = document.getElementById("buscar").value.toLowerCase().trim();
+    var listaFiltr = q
         ? data.filter(function(r) { return r.titulo.toLowerCase().indexOf(q) >= 0; })
         : data;
 
-    var st = document.getElementById('stats');
-    if (pend > 0) {
-        st.className = 'stats dirty';
-        st.textContent = pend + ' no guardados  —  ' + lista.length + ' / ' + data.length;
-    } else {
-        st.className = 'stats';
-        st.textContent = lista.length + ' de ' + data.length + ' registros';
-    }
-
+    
     if (lista.length === 0) {
-        document.getElementById('lista').innerHTML = '<div class="empty">&#128269; sin resultados</div>';
+        document.getElementById("lista").innerHTML = 
+		  '<div class="empty'><strong>No hay resultados</strong></div>";
         return;
     }
 
-    var html = '';
-    for (var k = 0; k < lista.length; k++) {
-        var r = lista[k];
-        var i = data.indexOf(r);
-        html += '<div class="record" id="r' + i + '">'
-            + '<div class="rec-header" onclick="tog(' + i + ')">'
-            + '<div class="rec-title"><strong>#' + (i+1) + '</strong> ' + x(r.titulo) + '</div>'
-            + '<span class="rec-arrow">&#9660;</span></div>'
-            + '<div class="rec-body">' + x(r.contenido) + '</div>'
-            + '<div class="rec-btns">'
-            + '<button class="rbtn rc" onclick="copiar(' + i + ')">&#128203; Copiar</button>'
-            + '<button class="rbtn re" onclick="abrirEdit(' + i + ')">&#9999; Editar</button>'
-            + '<button class="rbtn rd" onclick="abrirDel(' + i + ')">&#128465; Eliminar</button>'
-            + '</div></div>';
+    var rtn = "";
+    for (var i = 0; i < lista.length; i++) {
+        var r = lista[i];
+        var idx = data.indexOf(r);
+        rtn += 
+		
+		"<div class="'entry'>" +
+         "<strong>" + x(r.titulo) + "</strong>" + 
+		 "<div class='rec-body'>" + x(r.contenido) + "</div>" +
+         "div'class='rec-footer'>" +
+           
+        "<button class='btn' onclick="copiar(" + idx + ")'>Copiar</button>" +
+        "<button class='btn' onclick="abrirEdit(" + idx + ")'>Editar</button>" +
+        "<button class='btn' onclick="abrirDel(" + idx + ")'>Eliminar</button>" +
+       "</div></div>";
     }
-    document.getElementById('lista').innerHTML = html;
+    document.getElementById("lista").innerHTML = rtn;
 }
 
 function x(t) {
