@@ -14854,6 +14854,7 @@ function setAviso(color, msg) {
 
 function render() {
     var q = document.getElementById("buscar").value.toLowerCase().trim();
+	
     var listaFiltr = q
         ? data.filter(function(r) { return r.titulo.toLowerCase().indexOf(q) >= 0; })
         : data;
@@ -14861,7 +14862,7 @@ function render() {
     
     if (lista.length === 0) {
         document.getElementById("lista").innerHTML = 
-		  '<div class="empty'><strong>No hay resultados</strong></div>";
+		  "<div class='empty'><strong>No hay resultados</strong></div>";
         return;
     }
 
@@ -14876,9 +14877,9 @@ function render() {
 		 "<div class='rec-body'>" + x(r.contenido) + "</div>" +
          "div'class='rec-footer'>" +
            
-        "<button class='btn' onclick="copiar(" + idx + ")'>Copiar</button>" +
-        "<button class='btn' onclick="abrirEdit(" + idx + ")'>Editar</button>" +
-        "<button class='btn' onclick="abrirDel(" + idx + ")'>Eliminar</button>" +
+        "<button class='btn' onclick='copiar(" + idx + ")'>Copiar</button>" +
+        "<button class='btn' onclick='abrirEdit(" + idx + ")'>Editar</button>" +
+        "<button class='btn' onclick='abrirDel(" + idx + ")'>Eliminar</button>" +
        "</div></div>";
     }
     document.getElementById("lista").innerHTML = rtn;
