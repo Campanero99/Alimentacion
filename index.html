@@ -14861,37 +14861,40 @@ var lista = q
 
 if (lista.length === 0) {
 document.getElementById("lista").innerHTML =
-"<div class='empty'><strong>No hay resultados</strong></div>";
+'<div class="empty"><strong>No hay resultados</strong></div>';
 return;
 }
 
-var rtn = "";
+var html = "";
 for (var i = 0; i < lista.length; i++) {
 var r = lista[i];
 var idx = data.indexOf(r);
-rtn +=
-"<div class='record' id='r" + idx + "'>" +
-"<div class='rec-header' onclick='tog(" + idx + ")'>" +
-"<div class='rec-title'><strong>#"+ (idx+1) +"</strong> " + x(r.titulo) + "</div>" +
-"<span class='rec-arrow'>&#9660;</span></div>" +
-"<div class='rec-body'>" + x(r.contenido) + "</div>" +
-"<div class='rec-btns'>" +
-"<button class='rbtn rc' onclick='copiar(" + idx + ")'>&#128203; Copiar</button>" +
-"<button class='rbtn re' onclick='abrirEdit(" + idx + ")'>&#9999; Editar</button>" +
-"<button class='rbtn rd' onclick='abrirDel(" + idx + ")'>&#128465; Eliminar</button>" +
-"</div></div>";
+html +=
+'<div class="record" id="r' + idx + '">' +
+'<div class="rec-header" onclick="tog(' + idx + ')">' +
+'<div class="rec-title"><strong>#' + (idx + 1) + '</strong> ' + x(r.titulo) + '</div>' +
+'<span class="rec-arrow">&#9660;</span>' +
+'</div>' +
+'<div class="rec-body">' + x(r.contenido) + '</div>' +
+'<div class="rec-btns">' +
+'<button class="rbtn rc" onclick="copiar(' + idx + ')">&#128203; Copiar</button>' +
+'<button class="rbtn re" onclick="abrirEdit(' + idx + ')">&#9999; Editar</button>' +
+'<button class="rbtn rd" onclick="abrirDel(' + idx + ')">&#128465; Eliminar</button>' +
+'</div>' +
+'</div>';
 }
 
-document.getElementById("lista").innerHTML = rtn;
+document.getElementById("lista").innerHTML = html;
 }
-
-
 
 function x(t) {
-    var d = document.createElement('div');
-    d.textContent = t;
-    return d.innerHTML;
+return String(t).replace(/\n/g, "<br>");
 }
+
+
+
+
+
 
 function tog(i) {
     document.getElementById('r' + i).classList.toggle('open');
