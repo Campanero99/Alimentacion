@@ -14777,20 +14777,19 @@ Dr. Schnitzer</div><div class="rec-btns"><button class="rbtn rc" onclick="copiar
 </div>
 
 <script>
-const BASE = [{ titulo: "Abejas (1/4)", contenido: "La ley de la retención del calor olfativo del ..." },
-];
+const BASE = [{titulo:"Abejas", contenido:"Una ley de la retención del calor ol"}];
 
+const K = "env3Y";
+let data = [];
+let idx = 0;
+let pick = 1;
 
+data = BASE.map(r => ({ titulo: r.titulo, contenido: r.contenido }));
+
+let guardados = localStorage.getItem("guardados");
 if (guardados) {
 data = JSON.parse(guardados);
-} else {
-data = BASE.map(r => ({ titulo: r.titulo, contenido: r.contenido }));
 }
-const K = 'ern_v3';
-let data = [];
-let eIdx = -1;
-let dIdx = -1;
-let pend = 0;
 
 function init() {
 data = BASE.map(r => ({ titulo: r.titulo, contenido: r.contenido }));
