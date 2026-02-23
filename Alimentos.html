@@ -66,7 +66,7 @@ h1{font-size:1.6em;margin-bottom:4px}
       <button class="btn bo" onclick="ordenar()">📊 Ordenar</button>
       <button class="btn ba" onclick="todos()">🔄 Todos</button>
     </div>
-    <div class="stats dirty" id="stats">&amp;#9888; 2 no guardados  —  5 / 1889</div>
+    <div class="stats dirty" id="stats">&amp; 2 no guardados  —  5 / 1889</div>
   </div>
   <div class="results" id="lista"><div class="record" id="r734"><div class="rec-header" onclick="tog(734)"><div class="rec-title"><strong>#735</strong> Eccemas</div><span class="rec-arrow">▼</span></div><div class="rec-body">En realidad, los eccemas pertenecen al capítulo de las alergias porque suelen ser de naturaleza alérgica, pero es posible que no los busques ahí. Por lo tanto, se trata sobre todo de síntomas alérgicos, por lo que se aplica lo dicho en ese capítulo. También me gustaría señalar que a menudo pueden tratarse con éxito con orina. Como las enfermedades de la piel son sólo síntomas, a menudo es difícil distinguirlas; a menudo pueden ser infecciones o enfermedades fúngicas, en cuyo caso pueden responder bien a la plata coloidal o, por supuesto, a pomadas antibióticas o antifúngicas adecuadas.
 
@@ -308,7 +308,7 @@ function ordenar() {
     data.sort(function(a, b) { return a.titulo.localeCompare(b.titulo, 'de'); });
     pend++;
     render();
-    toast('&#10003; Sortiert!');
+    toast('&#10003; ordenado!');
 }
 
 function todos() {
