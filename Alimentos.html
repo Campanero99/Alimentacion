@@ -198,7 +198,7 @@ function render() {
     var st = document.getElementById('stats');
     if (pend > 0) {
         st.className = 'stats dirty';
-        st.textContent = '&#9888; ' + pend + ' no guardados  —  ' + lista.length + ' / ' + data.length;
+        st.textContent = pend + ' no guardados  —  ' + lista.length + ' / ' + data.length;
     } else {
         st.className = 'stats';
         st.textContent = lista.length + ' de ' + data.length + ' registros';
