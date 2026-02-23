@@ -96,9 +96,9 @@ Rhus tox D6, 5 gotas 3 veces al día.</div><div class="rec-btns"><button class="
 
 <div class="overlay" id="ovE">
   <div class="modal">
-    <h2 id="mTit">Bearbeiten</h2>
-    <div class="fg"><label>Titel *</label><input type="text" id="mT"></div>
-    <div class="fg"><label>Inhalt *</label><textarea id="mI"></textarea></div>
+    <h2 id="mTit">Editar</h2>
+    <div class="fg"><label>Título *</label><input type="text" id="mT"></div>
+    <div class="fg"><label>Contenido *</label><textarea id="mI"></textarea></div>
     <div class="mbtns">
       <button class="mbtn mcan" onclick="cerrarE()">Cancelar</button>
       <button class="mbtn mok" onclick="guardarReg()">✓ Guardar</button>
@@ -250,7 +250,7 @@ function copiar(i) {
 
 function abrirEdit(i) {
     eIdx = i;
-    document.getElementById('mTit').textContent = 'Bearbeiten';
+    document.getElementById('mTit').textContent = 'Editar';
     document.getElementById('mT').value = data[i].titulo;
     document.getElementById('mI').value = data[i].contenido;
     document.getElementById('ovE').classList.add('show');
@@ -258,7 +258,7 @@ function abrirEdit(i) {
 
 function abrirNuevo() {
     eIdx = -1;
-    document.getElementById('mTit').textContent = 'Neuer Eintrag';
+    document.getElementById('mTit').textContent = 'Nuevo';
     document.getElementById('mT').value = '';
     document.getElementById('mI').value = '';
     document.getElementById('ovE').classList.add('show');
@@ -272,7 +272,7 @@ function guardarReg() {
     var titulo = document.getElementById('mT').value.trim();
     var contenido = document.getElementById('mI').value.trim();
     if (!titulo || !contenido) {
-        toast('&#10060; Titel und Inhalt erforderlich');
+        toast('&#10060; título y contenido necesario');
         return;
     }
     if (eIdx >= 0) {
