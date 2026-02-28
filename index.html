@@ -14820,12 +14820,20 @@ function guardarEnDB(registros) {
     return new Promise(function(resolve, reject) {
         var tx = db.transaction(STORE, 'readwrite');
         var store = tx.objectStore(STORE);
-        store.clear();
-        for (var i = 0; i < registros.length; i++) {
-            store.add({ id: i + 1, titulo: registros[i].titulo, contenido: registros[i].contenido });
-        }
+        var clearReq = store.clear();
+        clearReq.onsuccess = function() {
+            var i = 0;
+            function addNext() {
+                if (i >= registros.length) return;
+                store.put({ id: i + 1, titulo: registros[i].titulo, contenido: registros[i].contenido });
+                i++;
+                if (i < registros.length) addNext();
+            }
+            addNext();
+        };
         tx.oncomplete = function() { resolve(); };
         tx.onerror = function(e) { reject(e.target.error); };
+        tx.onabort = function(e) { reject(e.target.error); };
     });
 }
 
@@ -14880,7 +14888,7 @@ function render() {
     var st = document.getElementById('stats');
     if (pend > 0) {
         st.className = 'stats dirty';
-        st.textContent = lista.length + ' / ' + data.length + ' registros (guardando...)';
+        st.textContent = 'Guardando... ' + lista.length + ' / ' + data.length;
     } else {
         st.className = 'stats';
         st.textContent = lista.length + ' de ' + data.length + ' registros';
@@ -15040,6 +15048,7 @@ function guardarHTML() {
     a.download = 'Alimentacion_' + ts + '.html';
     a.click();
     URL.revokeObjectURL(a.href);
+}
 }
     </script>
 <!-- Aviso legal -->
