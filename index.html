@@ -263,7 +263,6 @@ function iniciarApp() {
             }
             if (cargados.length > 0) {
                 data = cargados;
-                setAviso('green', '&#10003; ' + data.length + ' registros cargados');
             }
         }
     } catch(e) { setAviso('orange', '&#9888; Error al cargar: ' + e.message); }
