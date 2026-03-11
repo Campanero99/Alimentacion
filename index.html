@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de"><head>
+<html lang="es"><head>
 <meta charset="UTF-8">
 <link rel="icon" type="image/png" sizes="180x180" href="icon.png">
 <link rel="apple-touch-icon" sizes="180x180" href="manzana.png">
@@ -44,6 +44,10 @@ h1{font-size:1.6em;margin-bottom:4px}
 .mbtn{flex:1;padding:11px;border:none;border-radius:8px;cursor:pointer;font-weight:700;font-size:13px;color:#fff}
 .mok{background:#28a745}.mdel{background:#dc3545}.mcan{background:#6c757d}
 .empty{text-align:center;padding:40px;color:#6c757d}
+mark.hl{background:#ffe066;color:#000;border-radius:3px;padding:0 2px;font-weight:700}
+.search-mode{display:flex;gap:5px;margin-bottom:10px;}
+.smbtn{flex:1;padding:8px 6px;border:2px solid #dee2e6;border-radius:7px;cursor:pointer;font-weight:700;font-size:11px;background:#fff;color:#6c757d;transition:all .2s;}
+.smbtn.active{border-color:#667eea;background:#667eea;color:#fff;}
 
 /* ── PANTALLA DE LICENCIA ── */
 #lic-screen{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#667eea,#764ba2);z-index:99999;justify-content:center;align-items:center;padding:20px;}
@@ -81,6 +85,11 @@ h1{font-size:1.6em;margin-bottom:4px}
   <div class="aviso" id="aviso"></div>
   <div class="controls">
     <input type="text" id="buscar" class="search-input" placeholder="🔍 Buscar...">
+    <div class="search-mode">
+      <button class="smbtn active" id="sm-titulo" onclick="setModo('titulo')">📌 Título</button>
+      <button class="smbtn" id="sm-contenido" onclick="setModo('contenido')">📄 Contenido</button>
+      <button class="smbtn" id="sm-ambos" onclick="setModo('ambos')">🔍 Ambos</button>
+    </div>
     <div class="btns">
       <button class="btn bn" onclick="abrirNuevo()">➕ Nuevo</button>
       <button class="btn bo" onclick="ordenar()">📊 Ordenar</button>
@@ -249,6 +258,15 @@ let data = [];
 let eIdx = -1;
 let dIdx = -1;
 let pend = 0;
+let modoB = 'titulo'; // 'titulo', 'contenido', 'ambos'
+
+function setModo(m) {
+    modoB = m;
+    ['titulo','contenido','ambos'].forEach(function(id) {
+        document.getElementById('sm-' + id).classList.toggle('active', id === m);
+    });
+    render();
+}
 
 function iniciarApp() {
     data = BASE.map(function(r) { return { titulo: r.titulo, contenido: r.contenido }; });
@@ -286,17 +304,26 @@ function setAviso(color, msg) {
 
 function render() {
     var q = document.getElementById('buscar').value.toLowerCase().trim();
-    var lista = q ? data.filter(function(r) { return r.titulo.toLowerCase().indexOf(q) >= 0; }) : data;
-    document.getElementById('stats').textContent = data.length + ' registros';
+    var lista = q ? data.filter(function(r) {
+        var enTitulo = r.titulo.toLowerCase().indexOf(q) >= 0;
+        var enContenido = r.contenido.toLowerCase().indexOf(q) >= 0;
+        if (modoB === 'titulo')    return enTitulo;
+        if (modoB === 'contenido') return enContenido;
+        return enTitulo || enContenido;
+    }) : data;
+    var encontrados = lista.length;
+    document.getElementById('stats').textContent = data.length + ' registros' + (q ? ' — ' + encontrados + ' resultados' : '');
     if (lista.length === 0) { document.getElementById('lista').innerHTML = '<div class="empty">&#128269; sin resultados</div>'; return; }
     var html = '';
     for (var k = 0; k < lista.length; k++) {
         var r = lista[k]; var i = data.indexOf(r);
+        var qTitulo    = (modoB === 'titulo'    || modoB === 'ambos') ? q : '';
+        var qContenido = (modoB === 'contenido' || modoB === 'ambos') ? q : '';
         html += '<div class="record" id="r' + i + '">'
             + '<div class="rec-header" onclick="tog(' + i + ')">'
-            + '<div class="rec-title"><strong>#' + (i+1) + '</strong> ' + x(r.titulo) + '</div>'
+            + '<div class="rec-title"><strong>#' + (i+1) + '</strong> ' + resaltar(x(r.titulo), qTitulo) + '</div>'
             + '<span class="rec-arrow">&#9660;</span></div>'
-            + '<div class="rec-body">' + x(r.contenido) + '</div>'
+            + '<div class="rec-body">' + resaltar(x(r.contenido), qContenido) + '</div>'
             + '<div class="rec-btns">'
             + '<button class="rbtn rc" onclick="copiar(' + i + ')">&#128203; Copiar</button>'
             + '<button class="rbtn re" onclick="abrirEdit(' + i + ')">&#9999; Editar</button>'
@@ -307,6 +334,12 @@ function render() {
 }
 
 function x(t) { var d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+
+function resaltar(html, q) {
+    if (!q) return html;
+    var esc = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return html.replace(new RegExp('(' + esc + ')', 'gi'), '<mark class="hl">$1</mark>');
+}
 function tog(i) { document.getElementById('r' + i).classList.toggle('open'); }
 function copiar(i) {
     var ta = document.createElement('textarea');
@@ -344,7 +377,7 @@ function abrirDel(i) {
 }
 function cerrarD() { document.getElementById('ovD').classList.remove('show'); }
 function borrarOk() { data.splice(dIdx, 1); pend++; cerrarD(); render(); toast('&#10003; eliminado!'); }
-function ordenar() { data.sort(function(a,b){ return a.titulo.localeCompare(b.titulo,'de'); }); pend++; render(); toast('&#10003; Ordenado!'); }
+function ordenar() { data.sort(function(a,b){ return a.titulo.localeCompare(b.titulo,'es'); }); pend++; render(); toast('&#10003; Ordenado!'); }
 function todos() { document.getElementById('buscar').value = ''; render(); }
 
 function guardar() {
