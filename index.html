@@ -104,7 +104,7 @@ mark.hl{background:#ffe066;color:#000;border-radius:3px;padding:0 2px;font-weigh
 <div id="lic-screen">
   <div class="lic-box">
     <div style="font-size:2.5em;margin-bottom:10px;">🍎</div>
-    <h2>Alimentación y Salud</h2>
+    <h2>Ernährung und Gesundheit</h2>
     <p>Introduce tu código de acceso para continuar.<br>Solo necesitas hacerlo una vez en este dispositivo.</p>
     <input type="text" id="lic-input" class="lic-input" placeholder="XXXXXX-XXXXXX-XXXXXX-...">
     <button class="lic-btn" onclick="activarLicencia()">🔑 Activar acceso</button>
@@ -660,13 +660,10 @@ function guardar() {
             localStorage.removeItem(K + '_info');
             for (var t = 0; t < 10; t++) localStorage.removeItem(K + '_' + t);
             pend = 0; actualizarAvisoPendiente(); render();
+            setAviso('green', '&#10003; ' + soloNuevos.length + ' nuevos + ' + modificados.length + ' registros modificados guardados (' + kb + ' KB).');
             toast('&#10003; ¡Guardado en el navegador!');
         } catch(e) {
-            if (e.name === "QuotaExceededError") {
-                toast('&#10060; ¡Almacenamiento lleno! ¿Demasiadas fotos? Por favor exporta.');
-            } else {
-                toast('&#10060; Error: ' + e.message);
-            }
+            toast('&#10060; Error: ' + e.message);
         }
     }
     if (fotosAGuardar.length > 0) {
