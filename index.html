@@ -660,7 +660,6 @@ function guardar() {
             localStorage.removeItem(K + '_info');
             for (var t = 0; t < 10; t++) localStorage.removeItem(K + '_' + t);
             pend = 0; actualizarAvisoPendiente(); render();
-            setAviso('green', '&#10003; ' + soloNuevos.length + ' nuevos + ' + modificados.length + ' registros modificados guardados (' + kb + ' KB).');
             toast('&#10003; ¡Guardado en el navegador!');
         } catch(e) {
             if (e.name === "QuotaExceededError") {
