@@ -104,7 +104,7 @@ mark.hl{background:#ffe066;color:#000;border-radius:3px;padding:0 2px;font-weigh
 <div id="lic-screen">
   <div class="lic-box">
     <div style="font-size:2.5em;margin-bottom:10px;">🍎</div>
-    <h2>Alimentación y Salud</h2>
+    <h2>Ernährung und Gesundheit</h2>
     <p>Introduce tu código de acceso para continuar.<br>Solo necesitas hacerlo una vez en este dispositivo.</p>
     <input type="text" id="lic-input" class="lic-input" placeholder="XXXXXX-XXXXXX-XXXXXX-...">
     <button class="lic-btn" onclick="activarLicencia()">🔑 Activar acceso</button>
@@ -317,6 +317,52 @@ let pend = 0;
 let modoB = 'titulo';
 let fotoActual = null; // base64 de la foto en edición
 
+// ── IndexedDB para fotos ──
+var idb = null;
+function abrirIDB(cb) {
+    if (idb) { cb(idb); return; }
+    var req = indexedDB.open(K + '_fotos', 1);
+    req.onupgradeneeded = function(e) {
+        e.target.result.createObjectStore('fotos');
+    };
+    req.onsuccess = function(e) { idb = e.target.result; cb(idb); };
+    req.onerror = function() { cb(null); };
+}
+function guardarFotoIDB(idx, base64, cb) {
+    abrirIDB(function(db) {
+        if (!db) { cb && cb(); return; }
+        var tx = db.transaction('fotos', 'readwrite');
+        tx.objectStore('fotos').put(base64, String(idx));
+        tx.oncomplete = function() { cb && cb(); };
+        tx.onerror = function() { cb && cb(); };
+    });
+}
+function borrarFotoIDB(idx, cb) {
+    abrirIDB(function(db) {
+        if (!db) { cb && cb(); return; }
+        var tx = db.transaction('fotos', 'readwrite');
+        tx.objectStore('fotos').delete(String(idx));
+        tx.oncomplete = function() { cb && cb(); };
+    });
+}
+function cargarTodasFotosIDB(indices, cb) {
+    abrirIDB(function(db) {
+        if (!db || indices.length === 0) { cb({}); return; }
+        var fotos = {};
+        var tx = db.transaction('fotos', 'readonly');
+        var store = tx.objectStore('fotos');
+        var pendiente = indices.length;
+        indices.forEach(function(idx) {
+            var req = store.get(String(idx));
+            req.onsuccess = function(e) {
+                if (e.target.result) fotos[idx] = e.target.result;
+                if (--pendiente === 0) cb(fotos);
+            };
+            req.onerror = function() { if (--pendiente === 0) cb(fotos); };
+        });
+    });
+}
+
 // ── AVISO CAMBIOS PENDIENTES (desactivado) ──
 function actualizarAvisoPendiente() { /* sin aviso */ }
 
@@ -359,7 +405,21 @@ function iniciarApp() {
     } catch(e) { setAviso('orange', '&#9888; Error al cargar: ' + e.message); }
 
     pend = 0; actualizarAvisoPendiente();
-    render();
+
+    // Recuperar fotos de IndexedDB
+    var idxConFoto = [];
+    data.forEach(function(r, i) { if (r.fotoIDB) idxConFoto.push(i); });
+    if (idxConFoto.length > 0) {
+        cargarTodasFotosIDB(idxConFoto, function(fotos) {
+            idxConFoto.forEach(function(i) {
+                if (fotos[i]) data[i].foto = fotos[i];
+                delete data[i].fotoIDB;
+            });
+            render();
+        });
+    } else {
+        render();
+    }
 }
 
 function setAviso(color, msg) {
@@ -467,15 +527,32 @@ function eliminarFotoDirecta() {
 }
 
 // ── IMAGEN: campo en modal ──
+function comprimirImagen(file, callback) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var img = new Image();
+        img.onload = function() {
+            var canvas = document.createElement('canvas');
+            var MAX = 800; // max pixels ancho o alto
+            var w = img.width, h = img.height;
+            if (w > h) { if (w > MAX) { h = h * MAX / w; w = MAX; } }
+            else       { if (h > MAX) { w = w * MAX / h; h = MAX; } }
+            canvas.width = w; canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            var compressed = canvas.toDataURL('image/jpeg', 0.7); // calidad 70%
+            callback(compressed);
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
 function onFotoChange(ev) {
     var file = ev.target.files[0];
     if (!file) return;
-    var reader = new FileReader();
-    reader.onload = function(e) {
-        fotoActual = e.target.result;
-        mostrarPreviewModal(fotoActual);
-    };
-    reader.readAsDataURL(file);
+    comprimirImagen(file, function(compressed) {
+        fotoActual = compressed;
+        mostrarPreviewModal(compressed);
+    });
 }
 function mostrarPreviewModal(src) {
     document.getElementById('imgPreviewImg').src = src;
@@ -496,7 +573,7 @@ function eliminarFoto() {
 // ── EDITAR ──
 function abrirEdit(i) {
     eIdx = i;
-    document.getElementById('mTit').textContent = 'Editar';
+    document.getElementById('mTit').textContent = 'Bearbeiten';
     document.getElementById('mT').value = data[i].titulo;
     document.getElementById('mI').value = data[i].contenido;
     fotoActual = data[i].foto || null;
@@ -562,22 +639,44 @@ function guardar() {
         }
     }
 
-    try {
-        var payload = JSON.stringify({ nuevos: soloNuevos, modificados: modificados, total: data.length });
-        var kb = Math.round(payload.length / 1024);
-        localStorage.setItem(K + '_cambios', payload);
-        // Limpiar formato antiguo
-        localStorage.removeItem(K + '_info');
-        for (var t = 0; t < 10; t++) localStorage.removeItem(K + '_' + t);
-        pend = 0; actualizarAvisoPendiente(); render();
-        setAviso('green', '&#10003; ' + soloNuevos.length + ' neue + ' + modificados.length + ' geänderte Einträge gespeichert (' + kb + ' KB).');
-        toast('&#10003; ¡Guardado en el navegador!');
-    } catch(e) {
-        if (e.name === "QuotaExceededError") {
-            toast('&#10060; ¡Almacenamiento lleno! ¿Demasiadas fotos? Por favor exporta.');
-        } else {
-            toast('&#10060; Error: ' + e.message);
+    // Separar fotos de los datos de texto para no saturar localStorage
+    function sinFotos(lista) {
+        return lista.map(function(r) { return { titulo: r.titulo, contenido: r.contenido, fotoIDB: r.foto ? true : false }; });
+    }
+    // Guardar fotos en IndexedDB
+    var fotosAGuardar = [];
+    soloNuevos.forEach(function(r, i) {
+        if (r.foto) fotosAGuardar.push({ idx: baseLen + i, foto: r.foto });
+    });
+    modificados.forEach(function(m) {
+        if (m.reg.foto) fotosAGuardar.push({ idx: m.idx, foto: m.reg.foto });
+        else borrarFotoIDB(m.idx);
+    });
+    function guardarTexto() {
+        try {
+            var payload = JSON.stringify({ nuevos: sinFotos(soloNuevos), modificados: modificados.map(function(m){ return { idx: m.idx, reg: sinFotos([m.reg])[0] }; }), total: data.length });
+            var kb = Math.round(payload.length / 1024);
+            localStorage.setItem(K + '_cambios', payload);
+            localStorage.removeItem(K + '_info');
+            for (var t = 0; t < 10; t++) localStorage.removeItem(K + '_' + t);
+            pend = 0; actualizarAvisoPendiente(); render();
+            setAviso('green', '&#10003; ' + soloNuevos.length + ' nuevos + ' + modificados.length + ' registros modificados guardados (' + kb + ' KB).');
+            toast('&#10003; ¡Guardado en el navegador!');
+        } catch(e) {
+            if (e.name === "QuotaExceededError") {
+                toast('&#10060; ¡Almacenamiento lleno! ¿Demasiadas fotos? Por favor exporta.');
+            } else {
+                toast('&#10060; Error: ' + e.message);
+            }
         }
+    }
+    if (fotosAGuardar.length > 0) {
+        var pendFotos = fotosAGuardar.length;
+        fotosAGuardar.forEach(function(f) {
+            guardarFotoIDB(f.idx, f.foto, function() { if (--pendFotos === 0) guardarTexto(); });
+        });
+    } else {
+        guardarTexto();
     }
 }
 
@@ -603,8 +702,9 @@ function exportar() {
         localStorage.removeItem(K + '_cambios');
         localStorage.removeItem(K + '_info');
         for (var t = 0; t < 10; t++) localStorage.removeItem(K + '_' + t);
+        abrirIDB(function(db) { if (db) { try { db.transaction('fotos','readwrite').objectStore('fotos').clear(); } catch(e2){} } });
         pend = 0; actualizarAvisoPendiente();
-        toast('\u2713 Exportiert! Ernaehrung-Kopie.html heruntergeladen.');
+        toast('\u2713 ¡Exportado! Abre el nuevo archivo para continuar.');
     } catch(e) {
         toast('\u274c Exportfehler: ' + e.message);
     }
@@ -626,7 +726,21 @@ drop.addEventListener('drop', function(e){
     var file = e.dataTransfer.files[0];
     if (file && file.type.startsWith('image/')) {
         var reader = new FileReader();
-        reader.onload = function(ev){ fotoActual = ev.target.result; mostrarPreviewModal(fotoActual); };
+        reader.onload = function(ev){
+            var img2 = new Image();
+            img2.onload = function() {
+                var c2 = document.createElement('canvas');
+                var MAX2 = 800;
+                var w2 = img2.width, h2 = img2.height;
+                if (w2 > h2) { if (w2 > MAX2) { h2 = h2*MAX2/w2; w2=MAX2; } }
+                else         { if (h2 > MAX2) { w2 = w2*MAX2/h2; h2=MAX2; } }
+                c2.width=w2; c2.height=h2;
+                c2.getContext('2d').drawImage(img2,0,0,w2,h2);
+                fotoActual = c2.toDataURL('image/jpeg', 0.7);
+                mostrarPreviewModal(fotoActual);
+            };
+            img2.src = ev.target.result;
+        };
         reader.readAsDataURL(file);
     }
 });
