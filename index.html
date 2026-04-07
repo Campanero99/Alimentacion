@@ -378,11 +378,21 @@ function cargarTodasFotosIDB(indices, cb) {
 // ── AVISO CAMBIOS PENDIENTES (desactivado) ──
 function actualizarAvisoPendiente() { /* sin aviso */ }
 
-function setModo(m) {
+   function setModo(m) {
     modoB = m;
     ['titulo','contenido','ambos','fotos'].forEach(function(id) {
         var el = document.getElementById('sm-' + id);
         if (el) el.classList.toggle('active', id === m);
+    });
+    render();
+}
+
+function todos() {
+    document.getElementById('buscar').value = '';
+    modoB = 'titulo';
+    ['titulo','contenido','ambos','fotos'].forEach(function(id) {
+        var el = document.getElementById('sm-' + id);
+        if (el) el.classList.toggle('active', id === 'titulo');
     });
     render();
 }
