@@ -417,23 +417,24 @@ function iniciarApp() {
             }
         }
         pend = 0; actualizarAvisoPendiente();
-  });
-}
 
-    // Recuperar fotos de IndexedDB
-    var idxConFoto = [];
-    data.forEach(function(r, i) { if (r.fotoIDB) idxConFoto.push(i); });
-    if (idxConFoto.length > 0) {
-        cargarTodasFotosIDB(idxConFoto, function(fotos) {
-            idxConFoto.forEach(function(i) {
-                if (fotos[i]) data[i].foto = fotos[i];
-                delete data[i].fotoIDB;
+        // Recuperar fotos de IndexedDB
+        var idxConFoto = [];
+        data.forEach(function(r, i) { if (r.fotoIDB) idxConFoto.push(i); });
+        if (idxConFoto.length > 0) {
+            cargarTodasFotosIDB(idxConFoto, function(fotos) {
+                idxConFoto.forEach(function(i) {
+                    if (fotos[i]) data[i].foto = fotos[i];
+                    delete data[i].fotoIDB;
+                });
+                render();
             });
+        } else {
             render();
-        });
-    } else {
+        }
+    }).catch(function(e) {
         render();
-    }
+    });
 }
 
 function setAviso(color, msg) {
