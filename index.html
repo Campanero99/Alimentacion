@@ -389,15 +389,13 @@ function setModo(m) {
 
 function iniciarApp() {
     var baseData = (typeof BASE_DATA !== 'undefined') ? BASE_DATA : [];
+    data = baseData.map(function(r) { 
+        return { titulo: r.titulo, contenido: r.contenido, foto: r.foto || null }; 
+    });
 
-    // Cargar BASE como punto de partida
-    data = baseData.map(function(r) { return { titulo: r.titulo, contenido: r.contenido, foto: r.foto || null }; });
-
-    // Aplicar cambios guardados en localStorage (solo nuevos y modificados)
-    try {
-        var saved = localStorage.getItem(K + '_cambios');
-        if (saved) {
-            var obj = JSON.parse(saved);
+    window.storage.get('cambios').then(function(result) {
+        if (result && result.value) {
+            var obj = JSON.parse(result.value);
             if (obj.modificados) {
                 for (var m = 0; m < obj.modificados.length; m++) {
                     var mod = obj.modificados[m];
@@ -408,15 +406,8 @@ function iniciarApp() {
                 for (var n = 0; n < obj.nuevos.length; n++) data.push(obj.nuevos[n]);
             }
         }
-        // Limpiar formato antiguo
-        var oldInfo = localStorage.getItem(K + '_info');
-        if (oldInfo) {
-            localStorage.removeItem(K + '_info');
-            for (var t = 0; t < 10; t++) localStorage.removeItem(K + '_' + t);
-        }
-    } catch(e) { setAviso('orange', '&#9888; Error al cargar: ' + e.message); }
+        pend = 0; actualizarAvisoPendiente();
 
-    pend = 0; actualizarAvisoPendiente();
 
     // Recuperar fotos de IndexedDB
     var idxConFoto = [];
@@ -664,26 +655,26 @@ function guardar() {
         if (m.reg.foto) fotosAGuardar.push({ idx: m.idx, foto: m.reg.foto });
         else borrarFotoIDB(m.idx);
     });
-    function guardarTexto() {
-        try {
-            var payload = JSON.stringify({ nuevos: sinFotos(soloNuevos), modificados: modificados.map(function(m){ return { idx: m.idx, reg: sinFotos([m.reg])[0] }; }), total: data.length });
-            var kb = Math.round(payload.length / 1024);
-            localStorage.setItem(K + '_cambios', payload);
-            localStorage.removeItem(K + '_info');
-            for (var t = 0; t < 10; t++) localStorage.removeItem(K + '_' + t);
-            pend = 0; actualizarAvisoPendiente(); render();
-            toast('&#10003; ¡Guardado en el navegador!');
-        } catch(e) {
-            toast('&#10060; Error: ' + e.message);
-        }
-    }
-    if (fotosAGuardar.length > 0) {
-        var pendFotos = fotosAGuardar.length;
-        fotosAGuardar.forEach(function(f) {
-            guardarFotoIDB(f.idx, f.foto, function() { if (--pendFotos === 0) guardarTexto(); });
+	function guardarTexto() {
+    try {
+        var payload = JSON.stringify({ 
+            nuevos: sinFotos(soloNuevos), 
+            modificados: modificados.map(function(m){ 
+                return { idx: m.idx, reg: sinFotos([m.reg])[0] }; 
+            }), 
+            total: data.length 
         });
-    } else {
-        guardarTexto();
+        var kb = Math.round(payload.length / 1024);
+
+        window.storage.set('cambios', payload).then(function() {
+            pend = 0; actualizarAvisoPendiente(); render();
+            toast('&#10003; ¡Guardado en el navegador! (' + kb + ' KB)');
+        }).catch(function(e) {
+            toast('&#10060; Error al guardar: ' + e.message + ' (' + kb + ' KB)');
+        });
+
+    } catch(e) {
+        toast('&#10060; Error: ' + e.message);
     }
 }
 
