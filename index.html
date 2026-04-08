@@ -714,7 +714,7 @@ function exportar() {
         for (var t = 0; t < 10; t++) localStorage.removeItem(K + '_' + t);
         abrirIDB(function(db) { if (db) { try { db.transaction('fotos','readwrite').objectStore('fotos').clear(); } catch(e2){} } });
         pend = 0; actualizarAvisoPendiente();
-        toast('\u2713 Exportiert! Ernaehrung-Kopie.html heruntergeladen.');
+        toast('\u2713 Exportar! Alimentación-copia.html.');
     } catch(e) {
         toast('\u274c Exportfehler: ' + e.message);
     }
