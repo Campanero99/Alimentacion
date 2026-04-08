@@ -588,7 +588,7 @@ function eliminarFoto() {
 // ── EDITAR ──
 function abrirEdit(i) {
     eIdx = i;
-    document.getElementById('mTit').textContent = 'Bearbeiten';
+    document.getElementById('mTit').textContent = 'Editar';
     document.getElementById('mT').value = data[i].titulo;
     document.getElementById('mI').value = data[i].contenido;
     fotoActual = data[i].foto || null;
@@ -626,7 +626,7 @@ function guardarReg() {
     var reg = { titulo: titulo, contenido: contenido, foto: fotoActual };
     if (eIdx >= 0) { data[eIdx] = reg; } else { data.push(reg); }
     pend++; actualizarAvisoPendiente(); cerrarE(); render();
-    toast('&#10003; Eintrag gespeichert!');
+    toast('&#10003; Registro guardado!');
 }
 
 function abrirDel(i) {
