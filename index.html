@@ -511,7 +511,7 @@ function copiar(i) {
     ta.value = data[i].titulo + '\n\n' + data[i].contenido;
     ta.style.cssText = 'position:fixed;opacity:0';
     document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-    toast('&#10003; kopiert!');
+    toast('&#10003; copiado!');
 }
 
 // ── IMAGEN: ver en grande ──
@@ -631,7 +631,7 @@ function guardarReg() {
 
 function abrirDel(i) {
     dIdx = i;
-    document.getElementById('mDT').textContent = 'Löschen: "' + data[i].titulo + '"?';
+    document.getElementById('mDT').textContent = 'Borrar: "' + data[i].titulo + '"?';
     document.getElementById('ovD').classList.add('show');
 }
 function cerrarD() { document.getElementById('ovD').classList.remove('show'); }
