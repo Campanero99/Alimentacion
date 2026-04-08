@@ -478,7 +478,7 @@ function render() {
                 + '</div>';
         } else {
             imgHtml = '<div class="rec-img-area rec-img-add" onclick="event.stopPropagation();abrirEditFoto(' + i + ')" title="Bild hinzufügen">'
-                + '<div class="rec-img-placeholder"><span>📷</span>Bild hinzufügen – hier klicken</div>'
+                + '<div class="rec-img-placeholder"><span>📷</span>añadir foto – haga clic aquí</div>'
                 + '</div>';
         }
         html += '<div class="record" id="r' + i + '">'
@@ -608,7 +608,7 @@ function abrirEditFoto(i) {
 
 function abrirNuevo() {
     eIdx = -1;
-    document.getElementById('mTit').textContent = 'Neuer Eintrag';
+    document.getElementById('mTit').textContent = 'nuevo registro';
     document.getElementById('mT').value = '';
     document.getElementById('mI').value = '';
     fotoActual = null;
@@ -636,7 +636,7 @@ function abrirDel(i) {
 }
 function cerrarD() { document.getElementById('ovD').classList.remove('show'); }
 function borrarOk() { data.splice(dIdx, 1); pend++; actualizarAvisoPendiente(); cerrarD(); render(); toast('&#10003; Gelöscht!'); }
-function ordenar() { data.sort(function(a,b){ return a.titulo.localeCompare(b.titulo,'de'); }); pend++; actualizarAvisoPendiente(); render(); toast('&#10003; Sortiert!'); }
+function ordenar() { data.sort(function(a,b){ return a.titulo.localeCompare(b.titulo,'de'); }); pend++; actualizarAvisoPendiente(); render(); toast('&#10003; ordenado!'); }
 function todos() { document.getElementById('buscar').value = ''; setModo('titulo'); }
 
 function guardar() {
@@ -675,7 +675,7 @@ function guardar() {
             localStorage.removeItem(K + '_info');
             for (var t = 0; t < 10; t++) localStorage.removeItem(K + '_' + t);
             pend = 0; actualizarAvisoPendiente(); render();
-            toast('&#10003; Im Browser gespeichert!');
+            toast('&#10003; guardado en el navegador!');
         } catch(e) {
             toast('&#10060; Fehler: ' + e.message);
         }
@@ -707,7 +707,7 @@ function exportar() {
         var blob = new Blob([nuevo], { type: 'text/html;charset=utf-8' });
         var a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = 'Ernaehrung-Kopie.html';
+        a.download = 'alimentación-copia.html';
         document.body.appendChild(a); a.click(); document.body.removeChild(a);
         localStorage.removeItem(K + '_cambios');
         localStorage.removeItem(K + '_info');
