@@ -465,7 +465,7 @@ function render() {
         return enTitulo || enContenido;
     });
     var conFoto = data.filter(function(r){ return r.foto; }).length;
-    document.getElementById('stats').textContent = data.length + ' Einträge' + (conFoto > 0 ? ' — ' + conFoto + ' mit Foto' : '') + (q && modoB !== 'fotos' ? ' — ' + lista.length + ' Treffer' : (modoB === 'fotos' ? ' — ' + lista.length + ' mit Foto' : ''));
+    document.getElementById('stats').textContent = data.length + ' registros' + (conFoto > 0 ? ' — ' + conFoto + ' con Foto' : '') + (q && modoB !== 'fotos' ? ' — ' + lista.length + ' Treffer' : (modoB === 'fotos' ? ' — ' + lista.length + '' : ''));
     if (lista.length === 0) { document.getElementById('lista').innerHTML = '<div class="empty">&#128269; Keine Ergebnisse</div>'; return; }
     var html = '';
     for (var k = 0; k < lista.length; k++) {
@@ -488,9 +488,9 @@ function render() {
             + '<div class="rec-body">' + resaltar(x(r.contenido), q) + '</div>'
             + '<div class="rec-img-wrap">' + imgHtml + '</div>'
             + '<div class="rec-btns" onclick="event.stopPropagation()">'
-            + '<button class="rbtn rc" onclick="copiar(' + i + ')">&#128203; Kopieren</button>'
-            + '<button class="rbtn re" onclick="abrirEdit(' + i + ')">&#9999; Bearbeiten</button>'
-            + '<button class="rbtn rd" onclick="abrirDel(' + i + ')">&#128465; Löschen</button>'
+            + '<button class="rbtn rc" onclick="copiar(' + i + ')">&#128203; copiar</button>'
+            + '<button class="rbtn re" onclick="abrirEdit(' + i + ')">&#9999; editar</button>'
+            + '<button class="rbtn rd" onclick="abrirDel(' + i + ')">&#128465; borrar</button>'
             + '</div></div>';
     }
     document.getElementById('lista').innerHTML = html;
