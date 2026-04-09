@@ -465,7 +465,7 @@ function render() {
         return enTitulo || enContenido;
     });
     var conFoto = data.filter(function(r){ return r.foto; }).length;
-    document.getElementById('stats').textContent = data.length + ' registros' + (conFoto > 0 ? ' — ' + conFoto + ' con Fotos' : '') + (q && modoB !== 'fotos' ? ' — ' + lista.length + '' : (modoB === 'fotos' ? '' + lista.length + '' : ''));
+    document.getElementById('stats').textContent = data.length + ' registros' + (conFoto > 0 ? ' — ' + conFoto + ' con Fotos' : '') + (q && modoB !== 'fotos' ? ' — ' + lista.length + '' : (modoB === 'fotos' ? ''  : ''));
     if (lista.length === 0) { document.getElementById('lista').innerHTML = '<div class="empty">&#128269; Keine Ergebnisse</div>'; return; }
     var html = '';
     for (var k = 0; k < lista.length; k++) {
